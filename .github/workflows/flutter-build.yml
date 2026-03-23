@@ -107,10 +107,23 @@ jobs:
           submodules: recursive
           
       - name: Inject Custom Server and Key
-        shell: bash
+        shell: python
         run: |
-          sed -i "s@pub const RENDEZVOUS_SERVER.*@pub const RENDEZVOUS_SERVER: \&'static str = \"${{ secrets.RENDEZVOUS_SERVER }}\";@g" libs/hbb_common/src/config.rs
-          sed -i "s@pub const RS_PUB_KEY.*@pub const RS_PUB_KEY: \&'static str = \"${{ secrets.RS_PUB_KEY }}\";@g" libs/hbb_common/src/config.rs
+          import os, re
+          path = 'libs/hbb_common/src/config.rs'
+          
+          with open(path, 'r', encoding='utf-8') as f:
+              content = f.read()
+          
+          server = os.environ.get('RENDEZVOUS_SERVER', '')
+          key = os.environ.get('RS_PUB_KEY', '')
+          
+          content = re.sub(r'pub const RENDEZVOUS_SERVER:.*?=.*?".*?";', f'pub const RENDEZVOUS_SERVER: &\'static str = "{server}";', content)
+          content = re.sub(r'pub const RS_PUB_KEY:.*?=.*?".*?";', f'pub const RS_PUB_KEY: &\'static str = "{key}";', content)
+          
+          with open(path, 'w', encoding='utf-8') as f:
+              f.write(content)
+          print("Injeksi IP dan Key berhasil dieksekusi oleh Python!")
 
       - name: Restore bridge files
         uses: actions/download-artifact@master
