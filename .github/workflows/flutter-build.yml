@@ -106,27 +106,33 @@ jobs:
         with:
           submodules: recursive
           
-      - name: Inject Custom Server and Key
+      - name: The Ultimate Hardcode Injector
         shell: python
         run: |
           import os, re
           path = 'libs/hbb_common/src/config.rs'
-          
           with open(path, 'r', encoding='utf-8') as f:
-              content = f.read()
+              c = f.read()
           
-          server = os.environ.get('RENDEZVOUS_SERVER', '')
-          key = os.environ.get('RS_PUB_KEY', '')
+          s = os.environ.get('RENDEZVOUS_SERVER', '')
+          k = os.environ.get('RS_PUB_KEY', '')
           
-          content = re.sub(r'pub const DEFAULT_RENDEZVOUS_SERVER:\s*&.*?str\s*=\s*".*?";', f'pub const DEFAULT_RENDEZVOUS_SERVER: &\'static str = "{server}";', content)
-          content = re.sub(r'pub const DEFAULT_RS_PUB_KEY:\s*&.*?str\s*=\s*".*?";', f'pub const DEFAULT_RS_PUB_KEY: &\'static str = "{key}";', content)
-          
-          content = re.sub(r'pub const RENDEZVOUS_SERVER:\s*&.*?str\s*=\s*".*?";', f'pub const RENDEZVOUS_SERVER: &\'static str = "{server}";', content)
-          content = re.sub(r'pub const RS_PUB_KEY:\s*&.*?str\s*=\s*".*?";', f'pub const RS_PUB_KEY: &\'static str = "{key}";', content)
+          # Hantam semua variasi variabel yang pernah ada di sejarah RustDesk
+          c = re.sub(r'pub const RENDEZVOUS_SERVER:[^\n]*;', f'pub const RENDEZVOUS_SERVER: &\'static str = "{s}";', c)
+          c = re.sub(r'pub const RENDEZVOUS_SERVERS:[^\n]*;', f'pub const RENDEZVOUS_SERVERS: &\'static [&\'static str] = &["{s}"];', c)
+          c = re.sub(r'pub const RS_PUB_KEY:[^\n]*;', f'pub const RS_PUB_KEY: &\'static str = "{k}";', c)
+          c = re.sub(r'pub const DEFAULT_RENDEZVOUS_SERVER:[^\n]*;', f'pub const DEFAULT_RENDEZVOUS_SERVER: &\'static str = "{s}";', c)
+          c = re.sub(r'pub const DEFAULT_RS_PUB_KEY:[^\n]*;', f'pub const DEFAULT_RS_PUB_KEY: &\'static str = "{k}";', c)
           
           with open(path, 'w', encoding='utf-8') as f:
-              f.write(content)
-          print("Injeksi IP dan Key berhasil dieksekusi oleh Python!")
+              f.write(c)
+              
+          print("\n=== VERIFIKASI INJEKSI BERHASIL ===")
+          with open(path, 'r', encoding='utf-8') as f:
+              for line in f.readlines():
+                  if 'RENDEZVOUS_SERVER' in line or 'RS_PUB_KEY' in line:
+                      print(line.strip())
+          print("===================================\n")
 
       - name: Restore bridge files
         uses: actions/download-artifact@master
