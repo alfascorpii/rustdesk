@@ -1,6 +1,7 @@
 name: Build the flutter version of the RustDesk
 
 on:
+  workflow_dispatch:
   workflow_call:
     inputs:
       upload-artifact:
@@ -47,7 +48,7 @@ env:
   UPLOAD_ARTIFACT: "${{ inputs.upload-artifact }}"
   SIGN_BASE_URL: "${{ secrets.SIGN_BASE_URL }}-2"
   RENDEZVOUS_SERVER: "${{ secrets.RENDEZVOUS_SERVER }}"
-  RS_PUB_KEY: "${{ secrets.RS_PUB_KEY }}"
+  RS_PUB_KEY: "${{ secrets.RS_PUB_KEY }}"
 
 jobs:
   generate-bridge:
