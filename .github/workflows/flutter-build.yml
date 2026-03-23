@@ -118,8 +118,11 @@ jobs:
           server = os.environ.get('RENDEZVOUS_SERVER', '')
           key = os.environ.get('RS_PUB_KEY', '')
           
-          content = re.sub(r'pub const RENDEZVOUS_SERVER:.*?=.*?".*?";', f'pub const RENDEZVOUS_SERVER: &\'static str = "{server}";', content)
-          content = re.sub(r'pub const RS_PUB_KEY:.*?=.*?".*?";', f'pub const RS_PUB_KEY: &\'static str = "{key}";', content)
+          content = re.sub(r'pub const DEFAULT_RENDEZVOUS_SERVER:\s*&.*?str\s*=\s*".*?";', f'pub const DEFAULT_RENDEZVOUS_SERVER: &\'static str = "{server}";', content)
+          content = re.sub(r'pub const DEFAULT_RS_PUB_KEY:\s*&.*?str\s*=\s*".*?";', f'pub const DEFAULT_RS_PUB_KEY: &\'static str = "{key}";', content)
+          
+          content = re.sub(r'pub const RENDEZVOUS_SERVER:\s*&.*?str\s*=\s*".*?";', f'pub const RENDEZVOUS_SERVER: &\'static str = "{server}";', content)
+          content = re.sub(r'pub const RS_PUB_KEY:\s*&.*?str\s*=\s*".*?";', f'pub const RS_PUB_KEY: &\'static str = "{key}";', content)
           
           with open(path, 'w', encoding='utf-8') as f:
               f.write(content)
