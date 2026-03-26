@@ -943,33 +943,30 @@ jobs:
         with:
           submodules: recursive
 
-      - name: The Ultimate Hardcode Injector
+      - name: Inject Custom Server Settings
         shell: python
         run: |
-          import os, re
+          import re
           path = 'libs/hbb_common/src/config.rs'
           with open(path, 'r', encoding='utf-8') as f:
-              c = f.read()
+              data = f.read()
           
-          s = os.environ.get('RENDEZVOUS_SERVER', '')
-          k = os.environ.get('RS_PUB_KEY', '')
-          
-          # Hantam semua variasi variabel yang pernah ada di sejarah RustDesk
-          c = re.sub(r'pub const RENDEZVOUS_SERVER:[^\n]*;', f'pub const RENDEZVOUS_SERVER: &\'static str = "{s}";', c)
-          c = re.sub(r'pub const RENDEZVOUS_SERVERS:[^\n]*;', f'pub const RENDEZVOUS_SERVERS: &\'static [&\'static str] = &["{s}"];', c)
-          c = re.sub(r'pub const RS_PUB_KEY:[^\n]*;', f'pub const RS_PUB_KEY: &\'static str = "{k}";', c)
-          c = re.sub(r'pub const DEFAULT_RENDEZVOUS_SERVER:[^\n]*;', f'pub const DEFAULT_RENDEZVOUS_SERVER: &\'static str = "{s}";', c)
-          c = re.sub(r'pub const DEFAULT_RS_PUB_KEY:[^\n]*;', f'pub const DEFAULT_RS_PUB_KEY: &\'static str = "{k}";', c)
+          data = re.sub(r'pub const RENDEZVOUS_SERVER:\s*&\'static str\s*=\s*"[^"]*";', 'pub const RENDEZVOUS_SERVER: &\'static str = "remote.neodev.web.id";', data)
+          data = re.sub(r'pub const RS_PUB_KEY:\s*&\'static str\s*=\s*"[^"]*";', 'pub const RS_PUB_KEY: &\'static str = "qPmdpy1+2HnKuwnfMgnXV9XxXZtnEd0+7wEG8a8MNIM=";', data)
+          data = re.sub(r'pub const API_SERVER:\s*&\'static str\s*=\s*"[^"]*";', 'pub const API_SERVER: &\'static str = "https://remote.neodev.web.id";', data)
           
           with open(path, 'w', encoding='utf-8') as f:
-              f.write(c)
-              
-          print("\n=== VERIFIKASI INJEKSI BERHASIL ===")
-          with open(path, 'r', encoding='utf-8') as f:
-              for line in f.readlines():
-                  if 'RENDEZVOUS_SERVER' in line or 'RS_PUB_KEY' in line:
-                      print(line.strip())
-          print("===================================\n")
+              f.write(data)
+          print("✅ Custom settings injected successfully!")
+
+      - name: Configure Android Keystore
+        if: runner.os == 'Linux'
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/app/upload-keystore.jks
+          echo "storeFile=upload-keystore.jks" > android/key.properties
+          echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}" >> android/key.properties
+          echo "storePassword=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> android/key.properties
+          echo "keyPassword=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> android/key.properties
 
       - name: Install flutter
         uses: subosito/flutter-action@v2
@@ -1243,33 +1240,30 @@ jobs:
         with:
           submodules: recursive
 
-      - name: The Ultimate Hardcode Injector
+      - name: Inject Custom Server Settings
         shell: python
         run: |
-          import os, re
+          import re
           path = 'libs/hbb_common/src/config.rs'
           with open(path, 'r', encoding='utf-8') as f:
-              c = f.read()
+              data = f.read()
           
-          s = os.environ.get('RENDEZVOUS_SERVER', '')
-          k = os.environ.get('RS_PUB_KEY', '')
-          
-          # Hantam semua variasi variabel yang pernah ada di sejarah RustDesk
-          c = re.sub(r'pub const RENDEZVOUS_SERVER:[^\n]*;', f'pub const RENDEZVOUS_SERVER: &\'static str = "{s}";', c)
-          c = re.sub(r'pub const RENDEZVOUS_SERVERS:[^\n]*;', f'pub const RENDEZVOUS_SERVERS: &\'static [&\'static str] = &["{s}"];', c)
-          c = re.sub(r'pub const RS_PUB_KEY:[^\n]*;', f'pub const RS_PUB_KEY: &\'static str = "{k}";', c)
-          c = re.sub(r'pub const DEFAULT_RENDEZVOUS_SERVER:[^\n]*;', f'pub const DEFAULT_RENDEZVOUS_SERVER: &\'static str = "{s}";', c)
-          c = re.sub(r'pub const DEFAULT_RS_PUB_KEY:[^\n]*;', f'pub const DEFAULT_RS_PUB_KEY: &\'static str = "{k}";', c)
+          data = re.sub(r'pub const RENDEZVOUS_SERVER:\s*&\'static str\s*=\s*"[^"]*";', 'pub const RENDEZVOUS_SERVER: &\'static str = "remote.neodev.web.id";', data)
+          data = re.sub(r'pub const RS_PUB_KEY:\s*&\'static str\s*=\s*"[^"]*";', 'pub const RS_PUB_KEY: &\'static str = "qPmdpy1+2HnKuwnfMgnXV9XxXZtnEd0+7wEG8a8MNIM=";', data)
+          data = re.sub(r'pub const API_SERVER:\s*&\'static str\s*=\s*"[^"]*";', 'pub const API_SERVER: &\'static str = "https://remote.neodev.web.id";', data)
           
           with open(path, 'w', encoding='utf-8') as f:
-              f.write(c)
-              
-          print("\n=== VERIFIKASI INJEKSI BERHASIL ===")
-          with open(path, 'r', encoding='utf-8') as f:
-              for line in f.readlines():
-                  if 'RENDEZVOUS_SERVER' in line or 'RS_PUB_KEY' in line:
-                      print(line.strip())
-          print("===================================\n")
+              f.write(data)
+          print("✅ Custom settings injected successfully!")
+
+      - name: Configure Android Keystore
+        if: runner.os == 'Linux'
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/app/upload-keystore.jks
+          echo "storeFile=upload-keystore.jks" > android/key.properties
+          echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}" >> android/key.properties
+          echo "storePassword=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> android/key.properties
+          echo "keyPassword=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> android/key.properties
 
       - name: Install flutter
         uses: subosito/flutter-action@v2
